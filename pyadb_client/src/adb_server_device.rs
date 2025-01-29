@@ -1,11 +1,14 @@
 use adb_client::{ADBDeviceExt, ADBServerDevice};
 use anyhow::Result;
 use pyo3::{pyclass, pymethods};
+use pyo3_stub_gen_derive::{gen_stub_pyclass, gen_stub_pymethods};
 use std::{fs::File, path::PathBuf};
 
+#[gen_stub_pyclass]
 #[pyclass]
 pub struct PyADBServerDevice(pub ADBServerDevice);
 
+#[gen_stub_pymethods]
 #[pymethods]
 impl PyADBServerDevice {
     #[getter]
