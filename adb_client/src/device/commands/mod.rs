@@ -3,6 +3,5 @@ mod install;
 mod pull;
 mod push;
 mod reboot;
-mod shell;
+pub(crate) mod shell;
 mod stat;
-mod uninstall;

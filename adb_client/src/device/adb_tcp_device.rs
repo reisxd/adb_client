@@ -10,7 +10,7 @@ use crate::{ADBDeviceExt, ADBMessageTransport, ADBTransport, Result, TcpTranspor
 /// Represent a device reached and available over USB.
 #[derive(Debug)]
 pub struct ADBTcpDevice {
-    inner: ADBMessageDevice<TcpTransport>,
+    pub inner: ADBMessageDevice<TcpTransport>,
 }
 
 impl ADBTcpDevice {
@@ -20,7 +20,7 @@ impl ADBTcpDevice {
             inner: ADBMessageDevice::new(TcpTransport::new(address)?),
         };
 
-        device.connect()?;
+        device.connect().map_err(|e| format!("Failed to connect: {}", e));
 
         Ok(device)
     }
@@ -33,30 +33,33 @@ impl ADBTcpDevice {
             MessageCommand::Cnxn,
             0x01000000,
             1048576,
-            format!("host::{}\0", env!("CARGO_PKG_NAME")).as_bytes(),
+            format!("host::{}\0", "").as_bytes(),
         );
 
         self.get_transport_mut().write_message(message)?;
-
-        // At this point, we should have received a STLS command indicating that the device wants to upgrade connection with TLS
+        
         self.get_transport_mut()
             .read_message()
-            .and_then(|message| message.assert_command(MessageCommand::Stls))?;
-
-        self.get_transport_mut()
-            .write_message(ADBTransportMessage::new(MessageCommand::Stls, 1, 0, &[]))?;
-
-        // Upgrade TCP connection to TLS
-        self.get_transport_mut().upgrade_connection()?;
+            .map_err(|e| format!("Failed to read message: {}", e));
 
         log::debug!("Connection successfully upgraded from TCP to TLS");
-
+        
         Ok(())
     }
 
     #[inline]
     fn get_transport_mut(&mut self) -> &mut TcpTransport {
         self.inner.get_transport_mut()
+    }
+
+    #[inline]
+    pub fn inner(&self) -> &ADBMessageDevice<TcpTransport> {
+        &self.inner
+    }
+
+    #[inline]
+    pub fn inner_mut(&mut self) -> &mut ADBMessageDevice<TcpTransport> {
+        &mut self.inner
     }
 }
 
@@ -94,11 +97,6 @@ impl ADBDeviceExt for ADBTcpDevice {
     #[inline]
     fn install(&mut self, apk_path: &dyn AsRef<Path>) -> Result<()> {
         self.inner.install(apk_path)
-    }
-
-    #[inline]
-    fn uninstall(&mut self, package: &str) -> Result<()> {
-        self.inner.uninstall(package)
     }
 
     #[inline]

@@ -12,5 +12,4 @@ mod send;
 mod stat;
 mod tcpip;
 mod transport;
-mod uninstall;
 mod usb;

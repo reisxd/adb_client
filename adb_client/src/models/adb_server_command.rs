@@ -20,7 +20,6 @@ pub(crate) enum AdbServerCommand {
     MDNSServices,
     ServerStatus,
     ReconnectOffline,
-    Uninstall(String),
     Install(u64),
     // Local commands
     ShellCommand(String),
@@ -84,9 +83,6 @@ impl Display for AdbServerCommand {
             }
             AdbServerCommand::Usb => write!(f, "usb:"),
             AdbServerCommand::Install(size) => write!(f, "exec:cmd package 'install' -S {size}"),
-            AdbServerCommand::Uninstall(package) => {
-                write!(f, "exec:cmd package 'uninstall' {package}")
-            }
         }
     }
 }

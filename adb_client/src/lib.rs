@@ -6,7 +6,7 @@
 
 mod adb_device_ext;
 mod constants;
-mod device;
+pub mod device;
 mod emulator_device;
 mod error;
 mod mdns;

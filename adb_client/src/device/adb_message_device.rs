@@ -1,6 +1,6 @@
 use byteorder::{LittleEndian, ReadBytesExt};
 use rand::Rng;
-use std::io::{Cursor, Read, Seek};
+use std::{io::{Cursor, Read, Seek}, time::Duration};
 
 use crate::{constants::BUFFER_SIZE, ADBMessageTransport, AdbStatResponse, Result, RustADBError};
 
@@ -29,7 +29,7 @@ impl<T: ADBMessageTransport> ADBMessageDevice<T> {
         &self.transport
     }
 
-    pub(crate) fn get_transport_mut(&mut self) -> &mut T {
+    pub fn get_transport_mut(&mut self) -> &mut T {
         &mut self.transport
     }
 
@@ -208,11 +208,11 @@ impl<T: ADBMessageTransport> ADBMessageDevice<T> {
             self.get_remote_id()?,
             &bincode::serialize(&quit_buffer).map_err(|_e| RustADBError::ConversionError)?,
         ))?;
-        let _discard_close = self.transport.read_message()?;
+
         Ok(())
     }
 
-    pub(crate) fn open_session(&mut self, data: &[u8]) -> Result<ADBTransportMessage> {
+    pub fn open_session(&mut self, data: &[u8]) -> Result<ADBTransportMessage> {
         let mut rng = rand::thread_rng();
 
         let message = ADBTransportMessage::new(

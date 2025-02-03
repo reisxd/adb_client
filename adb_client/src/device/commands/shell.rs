@@ -23,6 +23,13 @@ impl<T: ADBMessageTransport> ADBMessageDevice<T> {
             let response = self.get_transport_mut().read_message()?;
             if response.header().command() != MessageCommand::Write {
                 break;
+            } else {
+                self.get_transport_mut().write_message(ADBTransportMessage::new(
+                    MessageCommand::Okay,
+                    response.header().arg1(),
+                    response.header().arg0(),
+                    &[],
+                ))?;
             }
 
             output.write_all(&response.into_payload())?;

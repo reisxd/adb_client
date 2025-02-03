@@ -10,7 +10,7 @@ pub const AUTH_RSAPUBLICKEY: u32 = 3;
 
 #[derive(Debug)]
 pub struct ADBTransportMessage {
-    header: ADBTransportMessageHeader,
+    pub header: ADBTransportMessageHeader,
     payload: Vec<u8>,
 }
 
